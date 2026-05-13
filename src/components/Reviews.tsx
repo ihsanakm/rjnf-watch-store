@@ -3,20 +3,23 @@
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import type { PageHeadingContent, ReviewCard } from '@/lib/cms-types';
+import { DEFAULT_REVIEWS, DEFAULT_REVIEWS_HEADING } from '@/lib/cms-defaults';
 
-const reviews = [
-  { id: 1, name: 'Alexander V.', text: 'The attention to detail on the Oceanic Pro is simply unmatched. It feels like a piece of art on my wrist.', rating: 5 },
-  { id: 2, name: 'Sophia M.', text: 'Fast delivery and premium packaging. The Heritage 1954 exceeded my expectations in every way.', rating: 5 },
-  { id: 3, name: 'Marcus L.', text: 'As a collector, I appreciate the mechanical integrity. RJNF has truly mastered the craft.', rating: 5 },
-  { id: 4, name: 'Elena R.', text: 'Stunning design and perfect weight. The Gold Reserve is my new favorite dress watch.', rating: 5 },
-  { id: 5, name: 'Julian K.', text: 'Exceptional service. The SkyWalker II is a masterpiece of aviation-inspired design.', rating: 5 },
-  { id: 6, name: 'Clara T.', text: 'Elegant, timeless, and precise. Exactly what I was looking for in a luxury timepiece.', rating: 5 },
-  { id: 7, name: 'David H.', text: 'The craftsmanship is evident from the moment you open the box. Highly recommended.', rating: 5 },
-  { id: 8, name: 'Isabella S.', text: 'Beautifully balanced design. It transitions perfectly from the office to evening events.', rating: 5 },
-  { id: 9, name: 'Victor B.', text: 'The movement is incredibly smooth. You can tell this is built to last generations.', rating: 5 },
-];
+function initialsFor(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    const a = parts[0][0];
+    const b = parts[parts.length - 1][0];
+    return `${a}${b}`.toUpperCase();
+  }
+  if (parts.length === 1 && parts[0].length >= 2) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase() || '?';
+}
 
-const ReviewColumn = ({ items, speed, reverse = false }: { items: typeof reviews, speed: number, reverse?: boolean }) => {
+const ReviewColumn = ({ items, speed, reverse = false }: { items: ReviewCard[], speed: number, reverse?: boolean }) => {
   const columnRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
@@ -35,7 +38,6 @@ const ReviewColumn = ({ items, speed, reverse = false }: { items: typeof reviews
       }
     );
 
-    // Pause on hover
     const handleMouseEnter = () => animation.pause();
     const handleMouseLeave = () => animation.play();
 
@@ -63,7 +65,7 @@ const ReviewColumn = ({ items, speed, reverse = false }: { items: typeof reviews
           <p className="text-obsidian font-medium leading-relaxed mb-6 italic">&quot;{review.text}&quot;</p>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-obsidian flex items-center justify-center text-white text-[10px] font-bold">
-              {review.name.split(' ')[0][0]}{review.name.split(' ')[1][0]}
+              {initialsFor(review.name)}
             </div>
             <span className="text-xs font-bold tracking-widest uppercase text-[#8D9096]">{review.name}</span>
           </div>
@@ -73,20 +75,27 @@ const ReviewColumn = ({ items, speed, reverse = false }: { items: typeof reviews
   );
 };
 
-const Reviews = () => {
+type ReviewsProps = {
+  reviews?: ReviewCard[];
+  heading?: PageHeadingContent;
+};
+
+const Reviews = ({
+  reviews = DEFAULT_REVIEWS,
+  heading = DEFAULT_REVIEWS_HEADING,
+}: ReviewsProps) => {
   return (
     <section className="reviews relative overflow-hidden border-t border-white/30 bg-white py-12 sm:py-16 lg:py-20" id="reviews">
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 md:px-12">
         <div className="mb-10 text-center sm:mb-16 lg:mb-20">
-          <span className="text-gold mb-4 block text-[10px] font-bold uppercase tracking-[0.32em] sm:text-xs sm:tracking-[0.4em]">Client Experience</span>
+          <span className="text-gold mb-4 block text-[10px] font-bold uppercase tracking-[0.32em] sm:text-xs sm:tracking-[0.4em]">{heading.eyebrow}</span>
           <h2 className="text-4xl font-black uppercase tracking-tighter text-obsidian sm:text-5xl md:text-6xl">
-            Voices of <br />
-            <span className="text-[#8D9096] opacity-30 font-medium">Excellence</span>
+            {heading.titleLine1} <br />
+            <span className="text-[#8D9096] opacity-30 font-medium">{heading.titleLine2}</span>
           </h2>
         </div>
 
         <div className="relative h-[620px] overflow-hidden sm:h-[700px]">
-          {/* Vertical Fades */}
           <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-white via-white/80 to-transparent z-10 pointer-events-none" />
           <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent z-10 pointer-events-none" />
 

@@ -1,0 +1,31 @@
+{
+  "kind": "singleType",
+  "collectionName": "footer_sections",
+  "info": {
+    "singularName": "footer-section",
+    "pluralName": "footer-sections",
+    "displayName": "Footer Section",
+    "description": "Footer credits and tagline"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "creditEyebrow": {
+      "type": "string",
+      "required": true
+    },
+    "designerFirstName": {
+      "type": "string",
+      "required": true
+    },
+    "designerLastName": {
+      "type": "string",
+      "required": true
+    },
+    "copyrightLine": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

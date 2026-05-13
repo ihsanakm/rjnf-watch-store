@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "page_headings",
+  "info": {
+    "singularName": "page-heading",
+    "pluralName": "page-headings",
+    "displayName": "Page Heading",
+    "description": "Section titles (catalogue, reviews, faq)"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "section": {
+      "type": "enumeration",
+      "enum": ["catalogue", "reviews", "faq"],
+      "required": true,
+      "unique": true
+    },
+    "eyebrow": {
+      "type": "string",
+      "required": true
+    },
+    "titleLine1": {
+      "type": "string",
+      "required": true
+    },
+    "titleLine2": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

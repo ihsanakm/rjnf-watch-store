@@ -4,31 +4,10 @@ import { useState, useRef } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import type { FaqItem, PageHeadingContent } from '@/lib/cms-types';
+import { DEFAULT_FAQS, DEFAULT_FAQ_HEADING } from '@/lib/cms-defaults';
 
-const faqs = [
-  {
-    question: "How do I secure a timepiece from the collection?",
-    answer: "Acquisitions are handled exclusively through our WhatsApp Inner Circle. Members receive priority notifications of new arrivals before they are listed publicly. Once a piece is announced, you can message our concierge directly to begin the secure acquisition process."
-  },
-  {
-    question: "Are all watches guaranteed authentic?",
-    answer: "Every timepiece in our collection undergoes a rigorous multi-point inspection by our master watchmakers. We provide a Certificate of Authenticity and a comprehensive mechanical integrity report with every purchase."
-  },
-  {
-    question: "Do you offer international, insured shipping?",
-    answer: "Yes, we ship globally using specialized high-value couriers. Every shipment is fully insured for its replacement value and requires an adult signature upon delivery. We handle all logistics to ensure your piece arrives in pristine condition."
-  },
-  {
-    question: "Can I request a specific model not in the catalogue?",
-    answer: "Through our extensive global network of collectors and heritage partners, we offer a bespoke sourcing service. If you are seeking a specific reference, our acquisition team can likely secure it for you privately."
-  },
-  {
-    question: "What is your warranty and return policy?",
-    answer: "We stand behind the mechanical excellence of every watch. All timepieces come with a 12-month mechanical warranty. Due to the unique nature of our curated collection, returns are handled on a case-by-case basis within 48 hours of delivery."
-  }
-];
-
-const FAQItem = ({ faq, isOpen, toggle }: { faq: typeof faqs[0], isOpen: boolean, toggle: () => void }) => {
+const FAQItem = ({ faq, isOpen, toggle }: { faq: FaqItem, isOpen: boolean, toggle: () => void }) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
@@ -76,7 +55,15 @@ const FAQItem = ({ faq, isOpen, toggle }: { faq: typeof faqs[0], isOpen: boolean
   );
 };
 
-const FAQ = () => {
+type FAQProps = {
+  faqs?: FaqItem[];
+  heading?: PageHeadingContent;
+};
+
+const FAQ = ({
+  faqs = DEFAULT_FAQS,
+  heading = DEFAULT_FAQ_HEADING,
+}: FAQProps) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const container = useRef<HTMLDivElement>(null);
 
@@ -90,7 +77,7 @@ const FAQ = () => {
       opacity: 0,
       duration: 1,
       stagger: 0.2,
-      ease: 'power3.out'
+      ease: 'power3.out',
     });
   }, { scope: container });
 
@@ -98,17 +85,17 @@ const FAQ = () => {
     <section className="faq bg-white py-12 sm:py-16 lg:py-20" id="faq" ref={container}>
       <div className="mx-auto max-w-[1000px] px-4 sm:px-6 md:px-12">
         <div className="faq-header mb-10 text-center sm:mb-16 lg:mb-20">
-          <span className="text-gold mb-4 block text-[10px] font-bold uppercase tracking-[0.32em] sm:text-xs sm:tracking-[0.4em]">Common Inquiries</span>
+          <span className="text-gold mb-4 block text-[10px] font-bold uppercase tracking-[0.32em] sm:text-xs sm:tracking-[0.4em]">{heading.eyebrow}</span>
           <h2 className="text-4xl font-black uppercase leading-[0.9] tracking-tighter text-obsidian sm:text-5xl md:text-6xl">
-            Acquisition <br />
-            <span className="text-[#8D9096] opacity-30 font-medium">Intelligence</span>
+            {heading.titleLine1} <br />
+            <span className="text-[#8D9096] opacity-30 font-medium">{heading.titleLine2}</span>
           </h2>
         </div>
 
         <div className="faq-list">
           {faqs.map((faq, index) => (
             <FAQItem 
-              key={index} 
+              key={`${faq.question}-${index}`} 
               faq={faq} 
               isOpen={openIndex === index} 
               toggle={() => setOpenIndex(openIndex === index ? null : index)} 

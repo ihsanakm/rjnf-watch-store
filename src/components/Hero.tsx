@@ -5,8 +5,14 @@ import Link from 'next/link';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import Header from './Header';
+import type { HeroContent } from '@/lib/cms-types';
+import { DEFAULT_HERO } from '@/lib/cms-defaults';
 
-const Hero = () => {
+type HeroProps = {
+  content?: HeroContent;
+};
+
+const Hero = ({ content = DEFAULT_HERO }: HeroProps) => {
   const container = useRef(null);
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const rippleRef = useRef<HTMLSpanElement>(null);
@@ -37,7 +43,6 @@ const Hero = () => {
 
     gsap.killTweensOf([ripple, btn]);
 
-    // Set origin based on entry side
     if (isLeft) {
       gsap.set(ripple, { left: 0, right: 'auto', width: '0%', opacity: 1 });
     } else {
@@ -63,7 +68,6 @@ const Hero = () => {
 
     gsap.killTweensOf([ripple, btn]);
 
-    // Animate width back to 0 toward the side the mouse exited
     if (isLeft) {
       gsap.set(ripple, { left: 0, right: 'auto' });
     } else {
@@ -88,10 +92,9 @@ const Hero = () => {
           playsInline
           className="w-full h-full object-cover"
         >
-          <source src="/video/herobg.mp4" type="video/mp4" />
+          <source src={content.videoSrc} type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-[#0A1128]/70 mix-blend-multiply"></div>
-        {/* <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128] via-transparent to-transparent opacity-60"></div> */}
       </div>
 
       <div className="relative z-10 flex min-h-[calc(100svh-1rem)] w-full flex-col px-3 sm:px-6 lg:min-h-[98vh] lg:px-9">
@@ -99,15 +102,14 @@ const Hero = () => {
 
         <div className="flex flex-1 flex-col items-center justify-center py-14 text-center sm:py-20 lg:mt-25 lg:block lg:max-w-4xl lg:py-0 lg:text-left">
           <span className="hero-subtitle mb-4 block text-[10px] font-semibold uppercase tracking-[0.32rem] text-gold sm:text-sm sm:tracking-[0.5rem]">
-            Timeless Excellence
+            {content.subtitle}
           </span>
           <h1 className="hero-title mb-6 text-[clamp(2.7rem,14vw,6rem)] font-black leading-none tracking-tighter text-white sm:mb-8 sm:text-[clamp(3rem,8vw,6rem)]">
-            PRECISION <br />
-            <span>IN EVERY SECOND</span>
+            {content.titleLine1} <br />
+            <span>{content.titleLine2}</span>
           </h1>
           <p className="hero-punchline mx-auto mb-6 max-w-2xl text-base leading-relaxed text-white/80 sm:text-xl lg:mx-0">
-            Engineered for the extraordinary,
-            designed for those who value every moment.
+            {content.punchline}
           </p>
           <Link
             href="#catalogue"

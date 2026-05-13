@@ -4,6 +4,8 @@ import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { MessageCircle, ArrowRight } from 'lucide-react';
+import type { ContactContent } from '@/lib/cms-types';
+import { DEFAULT_CONTACT } from '@/lib/cms-defaults';
 
 const InstagramIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
   <svg 
@@ -24,7 +26,11 @@ const InstagramIcon = ({ size = 20, className = "" }: { size?: number, className
   </svg>
 );
 
-const Contact = () => {
+type ContactProps = {
+  content?: ContactContent;
+};
+
+const Contact = ({ content = DEFAULT_CONTACT }: ContactProps) => {
   const container = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
@@ -43,24 +49,23 @@ const Contact = () => {
 
   return (
     <section className="contact relative overflow-hidden bg-obsidian py-12 text-white sm:py-16 lg:py-20" id="contact" ref={container}>
-      {/* Abstract Background Detail */}
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-white/5 rounded-full blur-[80px] translate-y-1/3 -translate-x-1/4 pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-[800px] px-4 text-center sm:px-6 md:px-12">
         <div className="contact-content">
-          <span className="text-gold mb-4 block text-[10px] font-bold uppercase tracking-[0.32em] sm:tracking-[0.4em]">First Access</span>
+          <span className="text-gold mb-4 block text-[10px] font-bold uppercase tracking-[0.32em] sm:tracking-[0.4em]">{content.eyebrow}</span>
           <h2 className="mb-6 text-3xl font-black uppercase leading-tight tracking-tighter sm:text-4xl md:text-5xl">
-            Join the <br />
-            <span className="text-[#8D9096]">Inner Circle</span>
+            {content.titleLine1} <br />
+            <span className="text-[#8D9096]">{content.titleLine2}</span>
           </h2>
           <p className="mx-auto mb-8 max-w-xl text-sm leading-relaxed text-white/60 sm:mb-10 md:text-base">
-            Priority arrivals are posted exclusively to our private WhatsApp community before they reach the public. Join our inner circle to secure your masterpiece.
+            {content.body}
           </p>
           
           <div className="flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center sm:gap-5">
             <a 
-              href="https://wa.me/yournumber" 
+              href={content.whatsappUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group flex w-full items-center justify-between rounded-lg bg-white px-6 py-4 text-xs font-bold uppercase tracking-widest text-obsidian transition-all duration-500 hover:bg-gold hover:text-white sm:min-w-[240px] sm:px-8"
@@ -73,7 +78,7 @@ const Contact = () => {
             </a>
 
             <a 
-              href="https://instagram.com/yourprofile" 
+              href={content.instagramUrl} 
               target="_blank" 
               rel="noopener noreferrer" 
               className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/20 px-6 py-4 text-xs font-bold uppercase tracking-widest transition-all duration-500 hover:border-white hover:bg-white/5 sm:min-w-[240px] sm:px-8"

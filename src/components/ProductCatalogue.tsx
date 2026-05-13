@@ -3,33 +3,41 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import type { PageHeadingContent, ProductCard } from '@/lib/cms-types';
+import { DEFAULT_CATALOGUE_HEADING, DEFAULT_PRODUCTS } from '@/lib/cms-defaults';
 
-const allFilters = ['All', 'Chronograph', 'Diving', 'Aviation', 'Dress', 'Limited Edition', 'Vintage'];
-
-const products = [
-  { id: 1, name: 'Oceanic Pro',   type: 'Diving',      price: 'LKR 4,200',  image: '/watch_collection_1.png' },
-  { id: 2, name: 'Skywalker II',  type: 'Aviation',    price: 'LKR 5,800',  image: '/watch_collection_2.png' },
-  { id: 3, name: 'Gold Reserve',  type: 'Dress',       price: 'LKR 12,500', image: '/watch_collection_1.png' },
-  { id: 4, name: 'Chronos-X',     type: 'Chronograph', price: 'LKR 7,200',  image: '/watch_collection_2.png' },
-  { id: 5, name: 'Heritage 1954', type: 'Vintage',     price: 'LKR 8,900',  image: '/watch_collection_1.png' },
-  { id: 6, name: 'Abyss Deep',    type: 'Diving',      price: 'LKR 6,400',  image: '/watch_collection_2.png' },
-  { id: 7, name: 'Cloud Master',  type: 'Aviation',    price: 'LKR 6,100',  image: '/watch_collection_2.png' },
-  { id: 8, name: 'Royal Onyx',    type: 'Dress',       price: 'LKR 15,900', image: '/watch_collection_1.png' },
-];
+type ProductCatalogueProps = {
+  products?: ProductCard[];
+  heading?: PageHeadingContent;
+};
 
 const EASE    = 'cubic-bezier(0.22,1,0.36,1)';
 const TRANSITION = `left 0.6s ${EASE}, transform 0.6s ${EASE}, filter 0.6s ${EASE}, opacity 0.6s ${EASE}, box-shadow 0.6s ${EASE}`;
 
-const ProductCatalogue = () => {
+const ProductCatalogue = ({
+  products: productsProp = DEFAULT_PRODUCTS,
+  heading = DEFAULT_CATALOGUE_HEADING,
+}: ProductCatalogueProps) => {
+  const products = productsProp;
+
+  const allFilters = useMemo(() => {
+    const unique = [...new Set(products.map((p) => p.type))];
+    unique.sort();
+    return ['All', ...unique];
+  }, [products]);
+
   const [activeFilter, setActiveFilter]         = useState('All');
   const [viewportWidth, setViewportWidth]       = useState(1200);
-  // currentIndex is an unbounded integer; it grows/shrinks freely as user navigates.
-  // We never reset it on navigation, only on filter change. This is the key to
-  // zero snap-back: the virtual index used as the React key persists across renders
-  // so CSS transitions see the same DOM node move between positions.
   const [currentIndex, setCurrentIndex]         = useState(0);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
   const [isAnimating, setIsAnimating]           = useState(false);
+
+  useEffect(() => {
+    if (activeFilter !== 'All' && !allFilters.includes(activeFilter)) {
+      setActiveFilter('All');
+      setCurrentIndex(0);
+    }
+  }, [activeFilter, allFilters]);
 
   useEffect(() => {
     const updateViewport = () => setViewportWidth(window.innerWidth);
@@ -53,21 +61,15 @@ const ProductCatalogue = () => {
     : products.filter(p => p.type === activeFilter);
 
   const total = filtered.length;
-  // Wrap any integer index into [0, total)
   const wrap = (n: number) => ((n % total) + total) % total;
 
-  // Navigation
   const navigate = (dir: 'left' | 'right') => {
     if (isAnimating || total <= 1) return;
     setIsAnimating(true);
     setCurrentIndex(prev => dir === 'right' ? prev + 1 : prev - 1);
-    // Match the CSS transition duration
     setTimeout(() => setIsAnimating(false), 620);
   };
 
-  // Filter change
-  // Disable transition so cards snap instantly to the new filter layout,
-  // then re-enable transitions after the browser has painted.
   const handleFilter = (f: string) => {
     if (f === activeFilter) return;
     setTransitionEnabled(false);
@@ -77,29 +79,23 @@ const ProductCatalogue = () => {
     requestAnimationFrame(() => requestAnimationFrame(() => setTransitionEnabled(true)));
   };
 
-  // Build 5-card virtual window
-  // Slot keys are the virtual indices [cI-2, cI-1, cI, cI+1, cI+2].
-  // These are always 5 unique integers, so there is no duplicate key even
-  // when total < 5.
   const slots = [-2, -1, 0, 1, 2].map(offset => ({
-    vi:      currentIndex + offset,   // virtual index used as React key
-    offset,                           // position in window (-2..2)
+    vi:      currentIndex + offset,
+    offset,
     product: filtered[wrap(currentIndex + offset)],
   }));
 
   return (
     <section className="catalogue bg-white py-12 sm:py-16 lg:py-20" id="catalogue">
 
-      {/* Header */}
       <div className="mx-auto mb-8 max-w-[1600px] px-4 text-center sm:px-6 md:mb-10">
-        <span className="text-gold mb-4 block text-[10px] font-bold uppercase tracking-[0.32em] sm:text-xs sm:tracking-[0.4em]">The Collection</span>
+        <span className="text-gold mb-4 block text-[10px] font-bold uppercase tracking-[0.32em] sm:text-xs sm:tracking-[0.4em]">{heading.eyebrow}</span>
         <h2 className="text-4xl font-black leading-none tracking-tighter text-obsidian sm:text-5xl md:text-7xl">
-          MASTERPIECES <br />
-          <span className="text-[#8D9096] opacity-30 font-medium">OF TIME</span>
+          {heading.titleLine1} <br />
+          <span className="text-[#8D9096] opacity-30 font-medium">{heading.titleLine2}</span>
         </h2>
       </div>
 
-      {/* Filters */}
       <div className="no-scrollbar mb-8 overflow-x-auto px-4 sm:px-6">
         <div className="mx-auto flex w-max items-center gap-6 pb-2 sm:gap-10">
           {allFilters.map(f => (
@@ -119,10 +115,8 @@ const ProductCatalogue = () => {
         </div>
       </div>
 
-      {/* Carousel */}
       <div className="flex flex-col items-center gap-5">
 
-        {/* Stage */}
         <div className="relative w-full overflow-hidden" style={{ height: metrics.cardHeight }}>
           {total === 0 ? (
             <div className="flex items-center justify-center h-full text-[#8D9096] text-sm tracking-widest uppercase">
@@ -130,6 +124,7 @@ const ProductCatalogue = () => {
             </div>
           ) : (
             slots.map(({ vi, offset, product }) => {
+              if (!product) return null;
               const isCentre = offset === 0;
               return (
                 <div
@@ -138,7 +133,6 @@ const ProductCatalogue = () => {
                   style={{
                     width:  metrics.cardWidth,
                     height: metrics.cardHeight,
-                    // ⬇ This left value is what CSS transitions between renders
                     left:        `calc(50% - ${metrics.cardWidth / 2}px + ${offset * metrics.gap}px)`,
                     transform:   `scale(${isCentre ? 1 : 0.85})`,
                     filter:      isCentre ? 'blur(0px)' : 'blur(6px)',
@@ -160,7 +154,6 @@ const ProductCatalogue = () => {
                     sizes="(max-width: 640px) 76vw, 320px"
                     className="object-cover"
                   />
-                  {/* Hover overlay, only on centre card */}
                   {isCentre && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 p-6 text-center opacity-0 backdrop-blur-[2px] transition-all duration-700 hover:opacity-100 sm:p-8">
                       <h3 className="mb-2 text-2xl font-black uppercase tracking-tighter text-white sm:text-3xl">{product.name}</h3>
@@ -170,7 +163,6 @@ const ProductCatalogue = () => {
                       </button>
                     </div>
                   )}
-                  {/* Type badge */}
                   <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
                     <span className="bg-white/90 backdrop-blur-md text-[9px] font-bold px-3 py-1.5 rounded-full text-black tracking-[0.16em] uppercase sm:text-[10px] sm:px-4 sm:tracking-[0.2em]">
                       {product.type}
@@ -182,7 +174,6 @@ const ProductCatalogue = () => {
           )}
         </div>
 
-        {/* Nav buttons */}
         <div className="flex items-center gap-6 sm:gap-10">
           <button
             onClick={() => navigate('left')}

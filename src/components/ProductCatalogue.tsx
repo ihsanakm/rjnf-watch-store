@@ -1,0 +1,218 @@
+'use client';
+
+import Image from 'next/image';
+import { useEffect, useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const allFilters = ['All', 'Chronograph', 'Diving', 'Aviation', 'Dress', 'Limited Edition', 'Vintage'];
+
+const products = [
+  { id: 1, name: 'Oceanic Pro',   type: 'Diving',      price: 'LKR 4,200',  image: '/watch_collection_1.png' },
+  { id: 2, name: 'Skywalker II',  type: 'Aviation',    price: 'LKR 5,800',  image: '/watch_collection_2.png' },
+  { id: 3, name: 'Gold Reserve',  type: 'Dress',       price: 'LKR 12,500', image: '/watch_collection_1.png' },
+  { id: 4, name: 'Chronos-X',     type: 'Chronograph', price: 'LKR 7,200',  image: '/watch_collection_2.png' },
+  { id: 5, name: 'Heritage 1954', type: 'Vintage',     price: 'LKR 8,900',  image: '/watch_collection_1.png' },
+  { id: 6, name: 'Abyss Deep',    type: 'Diving',      price: 'LKR 6,400',  image: '/watch_collection_2.png' },
+  { id: 7, name: 'Cloud Master',  type: 'Aviation',    price: 'LKR 6,100',  image: '/watch_collection_2.png' },
+  { id: 8, name: 'Royal Onyx',    type: 'Dress',       price: 'LKR 15,900', image: '/watch_collection_1.png' },
+];
+
+const EASE    = 'cubic-bezier(0.22,1,0.36,1)';
+const TRANSITION = `left 0.6s ${EASE}, transform 0.6s ${EASE}, filter 0.6s ${EASE}, opacity 0.6s ${EASE}, box-shadow 0.6s ${EASE}`;
+
+const ProductCatalogue = () => {
+  const [activeFilter, setActiveFilter]         = useState('All');
+  const [viewportWidth, setViewportWidth]       = useState(1200);
+  // currentIndex is an unbounded integer; it grows/shrinks freely as user navigates.
+  // We never reset it on navigation, only on filter change. This is the key to
+  // zero snap-back: the virtual index used as the React key persists across renders
+  // so CSS transitions see the same DOM node move between positions.
+  const [currentIndex, setCurrentIndex]         = useState(0);
+  const [transitionEnabled, setTransitionEnabled] = useState(true);
+  const [isAnimating, setIsAnimating]           = useState(false);
+
+  useEffect(() => {
+    const updateViewport = () => setViewportWidth(window.innerWidth);
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+    return () => window.removeEventListener('resize', updateViewport);
+  }, []);
+
+  const metrics = useMemo(() => {
+    const cardWidth = Math.min(320, Math.max(230, viewportWidth * 0.76));
+    const cardHeight = Math.min(480, Math.max(340, cardWidth * 1.5));
+    const gap = viewportWidth < 640
+      ? Math.max(180, cardWidth * 0.74)
+      : Math.min(350, Math.max(250, viewportWidth * 0.27));
+
+    return { cardWidth, cardHeight, gap };
+  }, [viewportWidth]);
+
+  const filtered = activeFilter === 'All'
+    ? products
+    : products.filter(p => p.type === activeFilter);
+
+  const total = filtered.length;
+  // Wrap any integer index into [0, total)
+  const wrap = (n: number) => ((n % total) + total) % total;
+
+  // Navigation
+  const navigate = (dir: 'left' | 'right') => {
+    if (isAnimating || total <= 1) return;
+    setIsAnimating(true);
+    setCurrentIndex(prev => dir === 'right' ? prev + 1 : prev - 1);
+    // Match the CSS transition duration
+    setTimeout(() => setIsAnimating(false), 620);
+  };
+
+  // Filter change
+  // Disable transition so cards snap instantly to the new filter layout,
+  // then re-enable transitions after the browser has painted.
+  const handleFilter = (f: string) => {
+    if (f === activeFilter) return;
+    setTransitionEnabled(false);
+    setActiveFilter(f);
+    setCurrentIndex(0);
+    setIsAnimating(false);
+    requestAnimationFrame(() => requestAnimationFrame(() => setTransitionEnabled(true)));
+  };
+
+  // Build 5-card virtual window
+  // Slot keys are the virtual indices [cI-2, cI-1, cI, cI+1, cI+2].
+  // These are always 5 unique integers, so there is no duplicate key even
+  // when total < 5.
+  const slots = [-2, -1, 0, 1, 2].map(offset => ({
+    vi:      currentIndex + offset,   // virtual index used as React key
+    offset,                           // position in window (-2..2)
+    product: filtered[wrap(currentIndex + offset)],
+  }));
+
+  return (
+    <section className="catalogue bg-white py-12 sm:py-16 lg:py-20" id="catalogue">
+
+      {/* Header */}
+      <div className="mx-auto mb-8 max-w-[1600px] px-4 text-center sm:px-6 md:mb-10">
+        <span className="text-gold mb-4 block text-[10px] font-bold uppercase tracking-[0.32em] sm:text-xs sm:tracking-[0.4em]">The Collection</span>
+        <h2 className="text-4xl font-black leading-none tracking-tighter text-obsidian sm:text-5xl md:text-7xl">
+          MASTERPIECES <br />
+          <span className="text-[#8D9096] opacity-30 font-medium">OF TIME</span>
+        </h2>
+      </div>
+
+      {/* Filters */}
+      <div className="no-scrollbar mb-8 overflow-x-auto px-4 sm:px-6">
+        <div className="mx-auto flex w-max items-center gap-6 pb-2 sm:gap-10">
+          {allFilters.map(f => (
+            <button
+              key={f}
+              onClick={() => handleFilter(f)}
+              className={`relative py-2 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 group whitespace-nowrap ${
+                activeFilter === f ? 'text-obsidian' : 'text-[#8D9096]'
+              }`}
+            >
+              {f}
+              <span className={`absolute bottom-0 left-0 h-px bg-obsidian transition-all duration-500 ${
+                activeFilter === f ? 'w-full' : 'w-0 group-hover:w-full'
+              }`} />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Carousel */}
+      <div className="flex flex-col items-center gap-5">
+
+        {/* Stage */}
+        <div className="relative w-full overflow-hidden" style={{ height: metrics.cardHeight }}>
+          {total === 0 ? (
+            <div className="flex items-center justify-center h-full text-[#8D9096] text-sm tracking-widest uppercase">
+              No pieces in this category
+            </div>
+          ) : (
+            slots.map(({ vi, offset, product }) => {
+              const isCentre = offset === 0;
+              return (
+                <div
+                  key={vi}
+                  className="absolute top-0"
+                  style={{
+                    width:  metrics.cardWidth,
+                    height: metrics.cardHeight,
+                    // ⬇ This left value is what CSS transitions between renders
+                    left:        `calc(50% - ${metrics.cardWidth / 2}px + ${offset * metrics.gap}px)`,
+                    transform:   `scale(${isCentre ? 1 : 0.85})`,
+                    filter:      isCentre ? 'blur(0px)' : 'blur(6px)',
+                    opacity:     isCentre ? 1 : Math.abs(offset) === 1 ? 0.42 : 0.15,
+                    zIndex:      isCentre ? 10 : 5 - Math.abs(offset),
+                    borderRadius: '1rem',
+                    overflow:    'hidden',
+                    boxShadow:   isCentre
+                      ? '0 32px 80px rgba(0,0,0,0.18)'
+                      : '0 8px 30px rgba(0,0,0,0.06)',
+                    pointerEvents: isCentre ? 'auto' : 'none',
+                    transition:  transitionEnabled ? TRANSITION : 'none',
+                  }}
+                >
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 640px) 76vw, 320px"
+                    className="object-cover"
+                  />
+                  {/* Hover overlay, only on centre card */}
+                  {isCentre && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 p-6 text-center opacity-0 backdrop-blur-[2px] transition-all duration-700 hover:opacity-100 sm:p-8">
+                      <h3 className="mb-2 text-2xl font-black uppercase tracking-tighter text-white sm:text-3xl">{product.name}</h3>
+                      <p className="text-gold mb-6 text-lg font-bold sm:mb-8 sm:text-xl">{product.price}</p>
+                      <button className="bg-white text-black px-6 py-3 rounded-md font-bold text-[10px] uppercase tracking-widest hover:bg-gold hover:text-white transition-all duration-300 sm:px-10 sm:py-4 sm:text-xs">
+                        Examine Piece
+                      </button>
+                    </div>
+                  )}
+                  {/* Type badge */}
+                  <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+                    <span className="bg-white/90 backdrop-blur-md text-[9px] font-bold px-3 py-1.5 rounded-full text-black tracking-[0.16em] uppercase sm:text-[10px] sm:px-4 sm:tracking-[0.2em]">
+                      {product.type}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Nav buttons */}
+        <div className="flex items-center gap-6 sm:gap-10">
+          <button
+            onClick={() => navigate('left')}
+            disabled={total <= 1 || isAnimating}
+            className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-obsidian/10 flex items-center justify-center text-obsidian hover:bg-obsidian hover:text-white transition-all duration-300 shadow-xl disabled:opacity-30 disabled:cursor-not-allowed sm:h-16 sm:w-16"
+          >
+            <ChevronLeft size={24} />
+          </button>
+
+          <span className="text-xs font-bold tracking-[0.3em] uppercase text-[#8D9096] min-w-[60px] text-center">
+            {total === 0 ? '-' : `${wrap(currentIndex) + 1} / ${total}`}
+          </span>
+
+          <button
+            onClick={() => navigate('right')}
+            disabled={total <= 1 || isAnimating}
+            className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-obsidian/10 flex items-center justify-center text-obsidian hover:bg-obsidian hover:text-white transition-all duration-300 shadow-xl disabled:opacity-30 disabled:cursor-not-allowed sm:h-16 sm:w-16"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </div>
+
+      </div>
+
+      <style jsx>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+    </section>
+  );
+};
+
+export default ProductCatalogue;

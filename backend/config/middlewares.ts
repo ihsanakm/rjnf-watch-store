@@ -27,7 +27,7 @@ const config: Core.Config.Middlewares = [
     config: {
       origin: (ctx: { request: { header: { origin?: string } } }) => {
         const requestOrigin = ctx.request.header.origin;
-        if (!requestOrigin) return false;
+        if (!requestOrigin) return [];
 
         const allowed = explicitOrigins();
         if (allowed.includes(requestOrigin)) return requestOrigin;
@@ -36,7 +36,7 @@ const config: Core.Config.Middlewares = [
           return requestOrigin;
         }
 
-        return false;
+        return [];
       },
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],

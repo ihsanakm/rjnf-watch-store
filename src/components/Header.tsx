@@ -17,10 +17,12 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
   const mobileLinkTone = variant === 'light' ? 'text-white/85 hover:text-white hover:bg-white/10' : 'text-obsidian/80 hover:text-obsidian hover:bg-obsidian/5';
 
   const links = [
-    { href: '#catalogue', label: 'Collection' },
-    { href: '#reviews', label: 'Reviews' },
-    { href: '#faq', label: 'FAQ' },
-    { href: '#contact', label: 'Contact Us' },
+    { href: '/', label: 'Home' },
+    { href: '/products', label: 'Products' },
+    { href: '/#catalogue', label: 'Collection' },
+    { href: '/#reviews', label: 'Reviews' },
+    { href: '/#faq', label: 'FAQ' },
+    { href: '/#contact', label: 'Contact Us' },
   ];
 
   useEffect(() => {
@@ -60,9 +62,9 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
         <Link href="/" className={`${linkTone} text-sm font-black tracking-[0.28em] uppercase sm:hidden`}>
           RJNF
         </Link>
-
+ 
         <nav className="hidden items-center gap-8 text-sm font-semibold md:flex lg:gap-10">
-          {links.slice(0, 3).map((link) => (
+          {links.slice(0, 4).map((link) => (
             <Link
               key={link.href}
               href={link.href}

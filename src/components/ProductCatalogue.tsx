@@ -1,10 +1,13 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import type { PageHeadingContent, ProductCard } from '@/lib/cms-types';
 import { DEFAULT_CATALOGUE_HEADING, DEFAULT_PRODUCTS } from '@/lib/cms-defaults';
+import { DEMO_PRODUCTS, IMAGES, type ProductItem } from './ProductsPageClient';
+import ProductModal from './ProductModal';
 
 type ProductCatalogueProps = {
   products?: ProductCard[];
@@ -31,6 +34,26 @@ const ProductCatalogue = ({
   const [currentIndex, setCurrentIndex]         = useState(0);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
   const [isAnimating, setIsAnimating]           = useState(false);
+  const [selectedProduct, setSelectedProduct]   = useState<ProductItem | null>(null);
+
+  const handleExaminePiece = (product: ProductCard) => {
+    const matchedProduct = DEMO_PRODUCTS.find(
+      dp => dp.name.toLowerCase() === product.name.toLowerCase()
+    );
+
+    const productToShow: ProductItem = matchedProduct || {
+      id: typeof product.id === 'number' ? product.id : parseInt(product.id as string) || 999,
+      name: product.name,
+      brand: 'RJNF',
+      category: product.type,
+      price: 0,
+      priceFormatted: product.price,
+      movement: 'Automatic',
+      image: product.image
+    };
+
+    setSelectedProduct(productToShow);
+  };
 
   useEffect(() => {
     if (activeFilter !== 'All' && !allFilters.includes(activeFilter)) {
@@ -158,7 +181,10 @@ const ProductCatalogue = ({
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 p-6 text-center opacity-0 backdrop-blur-[2px] transition-all duration-700 hover:opacity-100 sm:p-8">
                       <h3 className="mb-2 text-2xl font-black uppercase tracking-tighter text-white sm:text-3xl">{product.name}</h3>
                       <p className="text-gold mb-6 text-lg font-bold sm:mb-8 sm:text-xl">{product.price}</p>
-                      <button className="bg-white text-black px-6 py-3 rounded-md font-bold text-[10px] uppercase tracking-widest hover:bg-gold hover:text-white transition-all duration-300 sm:px-10 sm:py-4 sm:text-xs">
+                      <button 
+                        onClick={() => handleExaminePiece(product)}
+                        className="bg-white text-black px-6 py-3 rounded-md font-bold text-[10px] uppercase tracking-widest hover:bg-gold hover:text-white transition-all duration-300 sm:px-10 sm:py-4 sm:text-xs"
+                      >
                         Examine Piece
                       </button>
                     </div>
@@ -196,7 +222,18 @@ const ProductCatalogue = ({
           </button>
         </div>
 
+        <Link
+          href="/products"
+          className="mt-8 inline-flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase text-obsidian border border-obsidian/10 px-8 py-3 rounded-full hover:bg-obsidian hover:text-white transition-all duration-300"
+        >
+          View Full Collection
+          <ChevronRight size={14} />
+        </Link>
+
       </div>
+
+      {/* ═══════ Product Modal ═══════ */}
+      <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
 
       <style jsx>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }

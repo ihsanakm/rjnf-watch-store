@@ -56,15 +56,15 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
     });
   };
 
+  const underlineBg = variant === 'light' ? 'bg-white' : 'bg-obsidian';
+
   return (
-    <header ref={container} className="relative">
-      <div className="flex items-center justify-between border-b border-white/30 px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="/" className={`${linkTone} text-sm font-black tracking-[0.28em] uppercase sm:hidden`}>
-          RJNF
-        </Link>
- 
+    <header ref={container} className="relative w-full">
+      <div className="relative flex items-center justify-between border-b border-white/30 px-4 h-20 sm:px-6 lg:px-8 md:h-24">
+
+        {/* Left side: Navigation links (Home, Products, Collection) */}
         <nav className="hidden items-center gap-8 text-sm font-semibold md:flex lg:gap-10">
-          {links.slice(0, 4).map((link) => (
+          {links.slice(0, 3).map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -73,36 +73,54 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
               onMouseLeave={handleMouseLeave}
             >
               {link.label}
-              <span className="underline-gsap absolute -bottom-0.5 left-0 h-px w-0 bg-white" />
+              <span className={`underline-gsap absolute -bottom-0.5 left-0 h-px w-0 ${underlineBg}`} />
             </Link>
           ))}
         </nav>
 
-        <Link
-          href="#contact"
-          className={`nav-link relative hidden text-sm font-semibold ${linkTone} md:inline-flex`}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          Contact Us
-          <span className="underline-gsap absolute -bottom-0.5 left-0 h-px w-0 bg-white" />
-        </Link>
+        {/* Center: Logo (Mobile and Desktop) */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center">
+          <Link href="/" className="flex items-center justify-center">
+            <img
+              src="/logo.svg"
+              alt="RJNF Watch Store"
+              className="h-[110px] w-auto object-contain transition-transform duration-300 hover:scale-105 mix-blend-screen"
+            />
+          </Link>
+        </div>
 
-        <button
-          type="button"
-          aria-label={isOpen ? 'Close navigation' : 'Open navigation'}
-          aria-expanded={isOpen}
-          onClick={() => setIsOpen((open) => !open)}
-          className="flex h-11 w-11 items-center justify-center rounded-md border border-white/20 bg-white/10 text-white backdrop-blur md:hidden"
-        >
-          {isOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        {/* Right side: Navigation links (Reviews, FAQ, Contact Us) & Mobile Menu Toggle */}
+        <div className="flex items-center gap-8 lg:gap-10 ms-auto md:ms-0">
+          <nav className="hidden items-center gap-8 text-sm font-semibold md:flex lg:gap-10">
+            {links.slice(3).map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`nav-link relative ${linkTone}`}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                {link.label}
+                <span className={`underline-gsap absolute -bottom-0.5 left-0 h-px w-0 ${underlineBg}`} />
+              </Link>
+            ))}
+          </nav>
+
+          <button
+            type="button"
+            aria-label={isOpen ? 'Close navigation' : 'Open navigation'}
+            aria-expanded={isOpen}
+            onClick={() => setIsOpen((open) => !open)}
+            className="flex h-11 w-11 items-center justify-center rounded-md border border-white/20 bg-white/10 text-white backdrop-blur md:hidden"
+          >
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       <div
-        className={`absolute left-0 right-0 top-full z-30 mx-4 mt-3 overflow-hidden rounded-lg border border-white/15 ${mobilePanel} shadow-2xl backdrop-blur transition-all duration-300 md:hidden ${
-          isOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
-        }`}
+        className={`absolute left-0 right-0 top-full z-30 mx-4 mt-3 overflow-hidden rounded-lg border border-white/15 ${mobilePanel} shadow-2xl backdrop-blur transition-all duration-300 md:hidden ${isOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
+          }`}
       >
         <div className="flex flex-col p-2">
           {links.map((link) => (

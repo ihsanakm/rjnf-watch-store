@@ -41,14 +41,14 @@ export const DEFAULT_CATALOGUE_HEADING: PageHeadingContent = {
 };
 
 export const DEFAULT_PRODUCTS: ProductCard[] = [
-  { id: 1, name: 'Oceanic Pro', type: 'Diving', price: 'LKR 4,200', image: '/watch_collection_1.png' },
-  { id: 2, name: 'Skywalker II', type: 'Aviation', price: 'LKR 5,800', image: '/watch_collection_2.png' },
-  { id: 3, name: 'Gold Reserve', type: 'Dress', price: 'LKR 12,500', image: '/watch_collection_1.png' },
-  { id: 4, name: 'Chronos-X', type: 'Chronograph', price: 'LKR 7,200', image: '/watch_collection_2.png' },
-  { id: 5, name: 'Heritage 1954', type: 'Vintage', price: 'LKR 8,900', image: '/watch_collection_1.png' },
-  { id: 6, name: 'Abyss Deep', type: 'Diving', price: 'LKR 6,400', image: '/watch_collection_2.png' },
-  { id: 7, name: 'Cloud Master', type: 'Aviation', price: 'LKR 6,100', image: '/watch_collection_2.png' },
-  { id: 8, name: 'Royal Onyx', type: 'Dress', price: 'LKR 15,900', image: '/watch_collection_1.png' },
+  { id: 1, name: 'Binbond Skeletal Auto', type: "Men's Collection", price: 'LKR 24,500', image: '/watch_collection_1.png' },
+  { id: 2, name: 'Longlux Executive Auto', type: "Men's Collection", price: 'LKR 32,000', image: '/watch_collection_2.png' },
+  { id: 3, name: 'Longlux Velvet Auto', type: "Women's Collection", price: 'LKR 28,500', image: '/watch_collection_1.png' },
+  { id: 4, name: 'Forsining Starlight Sky', type: "Women's Collection", price: 'LKR 31,000', image: '/watch_collection_2.png' },
+  { id: 5, name: 'Longlux Alliance Auto', type: "Couple Collection", price: 'LKR 54,000', image: '/watch_collection_1.png' },
+  { id: 6, name: 'Omega Speedmaster Racing', type: 'Branded Watches', price: 'LKR 125,000', image: '/watch_collection_2.png' },
+  { id: 7, name: 'Rolex Submariner Date Clone', type: 'Super Clone Series', price: 'LKR 95,000', image: '/watch_collection_1.png' },
+  { id: 8, name: 'Patek Philippe Nautilus Clone', type: 'Super Clone Series', price: 'LKR 135,000', image: '/watch_collection_2.png' },
 ];
 
 export const DEFAULT_CONTACT: ContactContent = {

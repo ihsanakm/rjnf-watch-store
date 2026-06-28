@@ -42,15 +42,16 @@ const ProductCatalogue = ({
     );
 
     const productToShow: ProductItem = matchedProduct || {
+      ...product,
       id: typeof product.id === 'number' ? product.id : parseInt(product.id as string) || 999,
       name: product.name,
-      brand: 'RJNF',
+      brand: product.brand || 'RJNF',
       category: product.type,
-      price: 0,
+      price: typeof product.price === 'string' ? parseInt(product.price.replace(/\D/g, ''), 10) || 0 : 0,
       priceFormatted: product.price,
-      movement: 'Automatic',
+      movement: product.movement || 'Automatic',
       image: product.image
-    };
+    } as ProductItem;
 
     setSelectedProduct(productToShow);
   };

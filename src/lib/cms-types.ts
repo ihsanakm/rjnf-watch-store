@@ -18,6 +18,29 @@ export type ProductCard = {
   type: string;
   price: string;
   image: string;
+  overview?: string;
+  brand?: string;
+  model?: string;
+  movement?: string;
+  display?: string;
+  gender?: string;
+  caseMaterial?: string;
+  caseDiameter?: string;
+  caseThickness?: string;
+  dialColor?: string;
+  glassType?: string;
+  strapMaterial?: string;
+  strapColor?: string;
+  strapLength?: string;
+  strapWidth?: string;
+  claspType?: string;
+  waterResistance?: string;
+  weight?: string;
+  keyFeatures?: string[];
+  packageIncludes?: string[];
+  warranty?: string;
+  shippingDelivery?: string[];
+  careInstructions?: string[];
 };
 
 export type ReviewCard = {

@@ -15,6 +15,28 @@ export type ProductItem = {
   priceFormatted: string;
   movement: string;
   image: string;
+  // Product Details
+  overview?: string;
+  model?: string;
+  display?: string;
+  gender?: string;
+  caseMaterial?: string;
+  caseDiameter?: string;
+  caseThickness?: string;
+  dialColor?: string;
+  glassType?: string;
+  strapMaterial?: string;
+  strapColor?: string;
+  strapLength?: string;
+  strapWidth?: string;
+  claspType?: string;
+  waterResistance?: string;
+  weight?: string;
+  keyFeatures?: string[];
+  packageIncludes?: string[];
+  warranty?: string;
+  shippingDelivery?: string[];
+  careInstructions?: string[];
 };
 
 /* ───────────────── Demo Data ───────────────── */
@@ -30,7 +52,61 @@ export const DEMO_PRODUCTS: ProductItem[] = [
   { id: 1, name: 'Binbond Skeletal Auto', brand: 'Binbond', category: "Men's Collection", price: 24500, priceFormatted: 'LKR 24,500', movement: 'Automatic', image: '/watch_collection_1.png' },
   { id: 2, name: 'Longlux Executive Auto', brand: 'Longlux', category: "Men's Collection", price: 32000, priceFormatted: 'LKR 32,000', movement: 'Automatic', image: '/watch_collection_2.png' },
   { id: 3, name: 'Poedagar Prestige Auto', brand: 'Poedagar', category: "Men's Collection", price: 27500, priceFormatted: 'LKR 27,500', movement: 'Automatic', image: '/watch_collection_1.png' },
-  { id: 4, name: 'Wojtek Vanguard Auto', brand: 'Wojtek', category: "Men's Collection", price: 29000, priceFormatted: 'LKR 29,000', movement: 'Automatic', image: '/watch_collection_2.png' },
+  { 
+    id: 4, 
+    name: 'Wojtek Vanguard Auto', 
+    brand: 'Wojtek', 
+    category: "Men's Collection", 
+    price: 29000, 
+    priceFormatted: 'LKR 29,000', 
+    movement: 'Automatic', 
+    image: '/watch_collection_2.png',
+    overview: 'Enhance your style with the WOJTEK, a premium timepiece that combines elegant design with reliable performance. Crafted with high-quality materials and attention to detail, this watch is suitable for business, casual, and special occasions. Its sophisticated appearance and comfortable fit make it an excellent choice for everyday wear.',
+    model: 'RJNF-WT-010',
+    display: 'Analog',
+    gender: 'Men',
+    caseMaterial: 'Stainless Steel',
+    caseDiameter: '40 mm',
+    caseThickness: '12 mm',
+    dialColor: 'White',
+    glassType: 'Sapphire Crystal',
+    strapMaterial: 'Leather',
+    strapColor: 'Brown/Black',
+    strapLength: '22 cm',
+    strapWidth: '20 mm',
+    claspType: 'Buckle',
+    waterResistance: '5 ATM',
+    weight: '75g',
+    keyFeatures: [
+      'Premium Automatic movement',
+      'Durable Stainless Steel construction',
+      'Scratch-resistant Sapphire Crystal',
+      'Comfortable and secure fit',
+      'Elegant design suitable for business and casual wear',
+      'Water-resistant for daily use',
+      'High-quality finish with attention to detail'
+    ],
+    packageIncludes: [
+      '1 × WOJTEK',
+      'Premium Watch Box',
+      'RJNF Warranty Card',
+      'User Manual (if available)'
+    ],
+    warranty: 'This product includes a 1-Year RJNF Warranty covering manufacturing defects. Damage caused by accidents, misuse, water exposure beyond the stated rating, or normal wear and tear is not covered.',
+    shippingDelivery: [
+      'Islandwide delivery across Sri Lanka',
+      'Secure packaging',
+      'Fast order processing',
+      'Tracking details provided after dispatch'
+    ],
+    careInstructions: [
+      'Avoid strong impacts and dropping the watch.',
+      'Keep the watch clean using a soft microfiber cloth.',
+      'Avoid exposure to strong magnetic fields.',
+      'Follow the water-resistance guidelines for your model.',
+      'Store the watch in a dry place when not in use.'
+    ]
+  },
   { id: 5, name: 'Forsining Tourbillon Auto', brand: 'Forsining', category: "Men's Collection", price: 35000, priceFormatted: 'LKR 35,000', movement: 'Automatic', image: '/watch_collection_1.png' },
 
   // Men's Collection - Quartz
@@ -94,7 +170,24 @@ const MOVEMENTS  = ['All', 'Automatic', 'Quartz'];
 const PER_PAGE   = 12; // 4 columns × 3 rows
 
 /* ───────────────── Component ───────────────── */
-export default function ProductsPageClient() {
+export default function ProductsPageClient({ initialProducts = [] }: { initialProducts?: any[] }) {
+  const productsToUse = useMemo(() => {
+    if (initialProducts && initialProducts.length > 0) {
+      return initialProducts.map(p => ({
+        ...p,
+        id: p.id,
+        name: p.name,
+        category: p.type || p.category || 'Uncategorized',
+        price: typeof p.price === 'string' ? parseInt(p.price.replace(/\D/g, ''), 10) || 0 : p.price,
+        priceFormatted: typeof p.price === 'string' ? (p.price.startsWith('LKR') ? p.price : `LKR ${p.price}`) : `LKR ${p.price}`,
+        brand: p.brand || 'Unknown Brand',
+        movement: p.movement || 'Automatic',
+        image: p.image,
+      })) as ProductItem[];
+    }
+    return DEMO_PRODUCTS;
+  }, [initialProducts]);
+
   /* ── Filter state ── */
   const [category, setCategory]   = useState('All');
   const [brand, setBrand]         = useState('All');
@@ -114,10 +207,10 @@ export default function ProductsPageClient() {
     } else if (category === "Branded Watches") {
       list = ['All', 'Omega', 'Breitling', 'Cartier', 'Hublot'];
     } else {
-      list = ['All', ...Array.from(new Set(DEMO_PRODUCTS.map(p => p.brand))).sort()];
+      list = ['All', ...Array.from(new Set(productsToUse.map(p => p.brand))).sort()];
     }
     return list;
-  }, [category]);
+  }, [category, productsToUse]);
 
   // Adjust selected brand if it is no longer valid under the new category
   useEffect(() => {
@@ -128,7 +221,7 @@ export default function ProductsPageClient() {
 
   /* ── Filtering ── */
   const filtered = useMemo(() => {
-    let result = [...DEMO_PRODUCTS];
+    let result = [...productsToUse];
     if (category !== 'All') result = result.filter(p => p.category === category);
     if (brand !== 'All')    result = result.filter(p => p.brand === brand);
     if (movement !== 'All') result = result.filter(p => p.movement === movement);

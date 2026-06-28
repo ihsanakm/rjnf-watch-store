@@ -64,6 +64,13 @@ function mapHero(raw: Record<string, unknown> | null | undefined): HeroContent |
   return { subtitle, titleLine1, titleLine2, punchline, videoSrc };
 }
 
+function parseMarkdownList(text: unknown): string[] | undefined {
+  if (typeof text !== 'string') return undefined;
+  if (!text.trim()) return undefined;
+  const lines = text.split('\n').map(l => l.trim().replace(/^[-*]\s*/, '')).filter(l => l.length > 0);
+  return lines.length > 0 ? lines : [text];
+}
+
 function mapProduct(raw: Record<string, unknown>): ProductCard | null {
   const id = raw.documentId ?? raw.id;
   const name = typeof raw.name === 'string' ? raw.name : null;
@@ -72,7 +79,34 @@ function mapProduct(raw: Record<string, unknown>): ProductCard | null {
   const imagePath = mediaUrl(raw.image);
   if (id == null || !name || !type || !price) return null;
   const image = imagePath ? getStrapiMedia(imagePath) ?? '/watch_collection_1.png' : '/watch_collection_1.png';
-  return { id: id as string | number, name, type, price, image };
+  
+  return { 
+    id: id as string | number, 
+    name, type, price, image,
+    overview: typeof raw.overview === 'string' ? raw.overview : undefined,
+    brand: typeof raw.brand === 'string' ? raw.brand : undefined,
+    model: typeof raw.model === 'string' ? raw.model : undefined,
+    movement: typeof raw.movement === 'string' ? raw.movement : undefined,
+    display: typeof raw.display === 'string' ? raw.display : undefined,
+    gender: typeof raw.gender === 'string' ? raw.gender : undefined,
+    caseMaterial: typeof raw.caseMaterial === 'string' ? raw.caseMaterial : undefined,
+    caseDiameter: typeof raw.caseDiameter === 'string' ? raw.caseDiameter : undefined,
+    caseThickness: typeof raw.caseThickness === 'string' ? raw.caseThickness : undefined,
+    dialColor: typeof raw.dialColor === 'string' ? raw.dialColor : undefined,
+    glassType: typeof raw.glassType === 'string' ? raw.glassType : undefined,
+    strapMaterial: typeof raw.strapMaterial === 'string' ? raw.strapMaterial : undefined,
+    strapColor: typeof raw.strapColor === 'string' ? raw.strapColor : undefined,
+    strapLength: typeof raw.strapLength === 'string' ? raw.strapLength : undefined,
+    strapWidth: typeof raw.strapWidth === 'string' ? raw.strapWidth : undefined,
+    claspType: typeof raw.claspType === 'string' ? raw.claspType : undefined,
+    waterResistance: typeof raw.waterResistance === 'string' ? raw.waterResistance : undefined,
+    weight: typeof raw.weight === 'string' ? raw.weight : undefined,
+    keyFeatures: parseMarkdownList(raw.keyFeatures),
+    packageIncludes: parseMarkdownList(raw.packageIncludes),
+    warranty: typeof raw.warranty === 'string' ? raw.warranty : undefined,
+    shippingDelivery: parseMarkdownList(raw.shippingDelivery),
+    careInstructions: parseMarkdownList(raw.careInstructions),
+  };
 }
 
 function mapReview(raw: Record<string, unknown>): ReviewCard | null {

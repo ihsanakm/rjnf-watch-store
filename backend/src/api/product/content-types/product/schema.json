@@ -38,6 +38,75 @@
         "images"
       ],
       "required": true
+    },
+    "overview": {
+      "type": "text"
+    },
+    "brand": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "movement": {
+      "type": "string"
+    },
+    "display": {
+      "type": "string"
+    },
+    "gender": {
+      "type": "string"
+    },
+    "caseMaterial": {
+      "type": "string"
+    },
+    "caseDiameter": {
+      "type": "string"
+    },
+    "caseThickness": {
+      "type": "string"
+    },
+    "dialColor": {
+      "type": "string"
+    },
+    "glassType": {
+      "type": "string"
+    },
+    "strapMaterial": {
+      "type": "string"
+    },
+    "strapColor": {
+      "type": "string"
+    },
+    "strapLength": {
+      "type": "string"
+    },
+    "strapWidth": {
+      "type": "string"
+    },
+    "claspType": {
+      "type": "string"
+    },
+    "waterResistance": {
+      "type": "string"
+    },
+    "weight": {
+      "type": "string"
+    },
+    "keyFeatures": {
+      "type": "richtext"
+    },
+    "packageIncludes": {
+      "type": "richtext"
+    },
+    "warranty": {
+      "type": "richtext"
+    },
+    "shippingDelivery": {
+      "type": "richtext"
+    },
+    "careInstructions": {
+      "type": "richtext"
     }
   }
 }

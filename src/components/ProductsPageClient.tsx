@@ -15,6 +15,7 @@ export type ProductItem = {
   priceFormatted: string;
   movement: string;
   image: string;
+  images?: string[];
   // Product Details
   overview?: string;
   model?: string;

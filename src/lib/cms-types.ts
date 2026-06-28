@@ -18,6 +18,7 @@ export type ProductCard = {
   type: string;
   price: string;
   image: string;
+  images?: string[];
   overview?: string;
   brand?: string;
   model?: string;

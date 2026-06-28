@@ -37,10 +37,18 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
           <div className="product-modal-grid">
             <div className="product-modal-images">
               <img src={product.image} alt={product.name} className="product-modal-main-img" />
-              <div className="product-modal-sub-images">
-                <img src={IMAGES[(product.id) % 4]} alt="Detail 1" />
-                <img src={IMAGES[(product.id + 1) % 4]} alt="Detail 2" />
-              </div>
+              {product.images && product.images.length > 1 ? (
+                <div className="product-modal-sub-images">
+                  {product.images.slice(1, 3).map((img, idx) => (
+                    <img key={idx} src={img} alt={`Detail ${idx + 1}`} />
+                  ))}
+                </div>
+              ) : (
+                <div className="product-modal-sub-images">
+                  <img src={IMAGES[(typeof product.id === 'number' ? product.id : 0) % 4]} alt="Detail 1" />
+                  <img src={IMAGES[(typeof product.id === 'number' ? product.id + 1 : 1) % 4]} alt="Detail 2" />
+                </div>
+              )}
             </div>
             <div className="product-modal-info">
               <span className="product-card-brand">{product.brand}</span>

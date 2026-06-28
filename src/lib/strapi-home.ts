@@ -40,12 +40,25 @@ async function strapiFetchJson<T>(path: string, search: string): Promise<T | nul
   }
 }
 
+function mediaUrls(value: unknown): string[] {
+  if (!value || typeof value !== 'object') return [];
+  const v = value as { url?: string; data?: any };
+  if (typeof v.url === 'string') return [v.url];
+  
+  const urls: string[] = [];
+  if (Array.isArray(v)) {
+    for (const item of v) if (typeof item.url === 'string') urls.push(item.url);
+  } else if (Array.isArray(v.data)) {
+    for (const item of v.data) if (typeof item.url === 'string') urls.push(item.url);
+  } else if (v.data && typeof v.data.url === 'string') {
+    urls.push(v.data.url);
+  }
+  return urls;
+}
+
 function mediaUrl(value: unknown): string | null {
-  if (!value || typeof value !== 'object') return null;
-  const v = value as { url?: string; data?: { url?: string } };
-  if (typeof v.url === 'string') return v.url;
-  if (v.data && typeof v.data.url === 'string') return v.data.url;
-  return null;
+  const urls = mediaUrls(value);
+  return urls.length > 0 ? urls[0] : null;
 }
 
 function mapHero(raw: Record<string, unknown> | null | undefined): HeroContent | null {
@@ -76,13 +89,15 @@ function mapProduct(raw: Record<string, unknown>): ProductCard | null {
   const name = typeof raw.name === 'string' ? raw.name : null;
   const type = typeof raw.type === 'string' ? raw.type : null;
   const price = typeof raw.price === 'string' ? raw.price : null;
-  const imagePath = mediaUrl(raw.image);
-  if (id == null || !name || !type || !price) return null;
-  const image = imagePath ? getStrapiMedia(imagePath) ?? '/watch_collection_1.png' : '/watch_collection_1.png';
+  const imagePaths = mediaUrls(raw.image);
+  const image = imagePaths.length > 0 ? getStrapiMedia(imagePaths[0]) ?? '/watch_collection_1.png' : '/watch_collection_1.png';
+  const images = imagePaths.map(p => getStrapiMedia(p) || p).filter(Boolean) as string[];
   
+  if (id == null || !name || !type || !price) return null;
+
   return { 
     id: id as string | number, 
-    name, type, price, image,
+    name, type, price, image, images,
     overview: typeof raw.overview === 'string' ? raw.overview : undefined,
     brand: typeof raw.brand === 'string' ? raw.brand : undefined,
     model: typeof raw.model === 'string' ? raw.model : undefined,
